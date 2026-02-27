@@ -13,67 +13,130 @@ st.set_page_config(
     page_title="Obsidian -> PDF",
     page_icon="📄",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed" # Collapsed by default for cleaner look
 )
 
-# --- 2. CUSTOM CSS (Visuals) ---
+# --- 2. CSS STYLING ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
-    .stApp { background-color: #f8f9fa; font-family: 'Inter', sans-serif; }
-    h1 { font-family: 'Inter', sans-serif; background: -webkit-linear-gradient(45deg, #6a11cb, #2575fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .css-card { background-color: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e0e0e0; }
-    div.stButton > button { background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%); color: white; border: none; padding: 12px 28px; border-radius: 8px; font-weight: 600; }
-    .footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: white; text-align: center; padding: 10px; font-size: 12px; color: #888; border-top: 1px solid #eaeaea; }
+    
+    /* App Background */
+    .stApp { background-color: #f4f6f9; font-family: 'Inter', sans-serif; }
+    
+    /* Header */
+    h1 { 
+        font-family: 'Inter', sans-serif; 
+        font-weight: 800; 
+        color: #1f2937;
+    }
+    
+    /* Card Style */
+    .css-card { 
+        background-color: white; 
+        padding: 25px; 
+        border-radius: 12px; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+        border: 1px solid #e5e7eb;
+        text-align: center;
+    }
+    
+    /* Download Button - Make it Big and Green */
+    div.stButton > button { 
+        background-color: #10b981; 
+        color: white; 
+        border: none; 
+        padding: 15px 32px; 
+        font-size: 18px;
+        border-radius: 8px; 
+        font-weight: 700; 
+        width: 100%;
+        transition: all 0.2s;
+    }
+    div.stButton > button:hover { 
+        background-color: #059669; 
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        color: white;
+    }
+    
+    /* Hide the default streamlit menu */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
-# --- 3. PDF STYLING (The Print Layout) ---
-# FIX: Removed 'text-transform: uppercase' from admonition-title
-# FIX: Added 'ul, ol' styles to ensure lists work inside callouts
+# --- 3. PDF CSS (The Look of the Document) ---
 PDF_STYLE = """
 <style>
     @import url('https://fonts.googleapis.com/css2?family=EB+Garamond&family=Lato:wght@400;700&display=swap');
     @page { size: A4; margin: 20mm; }
-    body { font-family: "EB Garamond", serif; font-size: 12pt; line-height: 1.6; color: #222; }
     
-    h1, h2, h3, h4 { font-family: "Lato", sans-serif; page-break-after: avoid; color: #000; margin-top: 1.5em; }
-    h1 { border-bottom: 2px solid #000; text-align: center; margin-top: 0; }
+    body { 
+        font-family: "EB Garamond", serif; 
+        font-size: 12.5pt; 
+        line-height: 1.65; 
+        color: #111; 
+        text-align: justify;
+    }
+    
+    h1, h2, h3, h4 { 
+        font-family: "Lato", sans-serif; 
+        page-break-after: avoid; 
+        color: #000; 
+        margin-top: 1.5em; 
+        margin-bottom: 0.5em;
+    }
+    h1 { border-bottom: 2px solid #000; text-align: center; margin-top: 0; font-size: 24pt; }
+    h2 { border-bottom: 1px solid #ccc; font-size: 18pt; }
     
     /* Tables */
-    table { width: 100%; border-collapse: collapse; margin: 1em 0; page-break-inside: avoid; }
-    th, td { border: 1px solid #ccc; padding: 6px; vertical-align: top; }
+    table { width: 100%; border-collapse: collapse; margin: 1em 0; page-break-inside: avoid; font-family: "Lato", sans-serif; font-size: 10pt; }
+    th, td { border: 1px solid #ccc; padding: 8px; vertical-align: top; text-align: left; }
+    th { background-color: #f3f4f6; font-weight: bold; }
     
     /* Code Blocks */
-    pre { background: #f4f4f4; padding: 10px; border-radius: 5px; white-space: pre-wrap; page-break-inside: avoid; font-family: monospace; font-size: 0.9em; }
+    pre { 
+        background: #f1f5f9; 
+        padding: 12px; 
+        border-radius: 6px; 
+        white-space: pre-wrap; 
+        page-break-inside: avoid; 
+        font-family: "Courier New", monospace; 
+        font-size: 0.9em; 
+        border: 1px solid #e2e8f0;
+    }
     
-    /* Callouts (Admonitions) - FIXED */
+    /* Callouts (Admonitions) - CRITICAL FIX */
     .admonition { 
-        border-left: 5px solid #448aff; 
-        background: #f8f9fa; 
+        border-left: 5px solid #3b82f6; 
+        background: #eff6ff; 
         padding: 15px; 
         margin: 1.5em 0; 
         page-break-inside: avoid; 
-        border-radius: 0 4px 4px 0; 
+        border-radius: 4px; 
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
     .admonition-title { 
         font-weight: bold; 
         display: block; 
         font-family: "Lato", sans-serif; 
         margin-bottom: 8px;
-        color: #333;
-        /* Removed text-transform: uppercase to fix all-caps bug */
+        color: #1e3a8a;
+        font-size: 1em;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
     }
     
     /* Callout Colors */
-    .admonition.note { border-color: #448aff; background: #eff6ff; }
-    .admonition.tip { border-color: #22c55e; background: #f0fdf4; }
-    .admonition.warning { border-color: #eab308; background: #fefce8; }
-    .admonition.danger { border-color: #ef4444; background: #fef2f2; }
-    .admonition.example { border-color: #a855f7; background: #f3e8ff; }
+    .admonition.note { border-left-color: #3b82f6; background: #eff6ff; } /* Blue */
+    .admonition.tip { border-left-color: #10b981; background: #ecfdf5; } /* Green */
+    .admonition.warning { border-left-color: #f59e0b; background: #fffbeb; } /* Yellow */
+    .admonition.danger { border-left-color: #ef4444; background: #fef2f2; } /* Red */
+    .admonition.example { border-left-color: #8b5cf6; background: #f5f3ff; } /* Purple */
+    .admonition.quote { border-left-color: #64748b; background: #f8fafc; } /* Grey */
 
-    /* Lists inside callouts need margin reset */
-    .admonition ul, .admonition ol { margin-top: 0; padding-left: 20px; }
+    /* Lists inside callouts */
+    .admonition ul, .admonition ol { margin-bottom: 0; padding-left: 20px; }
     
     /* Diagrams */
     .mermaid { display: flex; justify-content: center; margin: 2em auto; page-break-inside: avoid; }
@@ -88,105 +151,124 @@ SCRIPTS = """
 <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 """
 
-# --- 4. LOGIC FIXES ---
-def process_obsidian_syntax(text):
-    # 1. Strip Frontmatter
+# --- 4. ROBUST PARSING ENGINE (The Fix) ---
+def parse_markdown_chunks(text):
+    """
+    Parses Markdown by splitting it into 'Normal' chunks and 'Callout' chunks.
+    This prevents the HTML <div> tags from being escaped by the markdown parser.
+    """
+    # 1. Frontmatter Removal
     if text.startswith("---"):
         try: _, _, text = text.split("---", 2)
         except: pass
 
-    # 2. Fix WikiLinks [[Link|Text]] -> **Text**
+    # 2. Fix Obsidian WikiLinks
     text = re.sub(r'\[\[([^\]|]+)\|([^\]]+)\]\]', r'**\2**', text)
     text = re.sub(r'\[\[([^\]]+)\]\]', r'**\1**', text)
 
-    # 3. Process Callouts with Recursive Markdown Parsing
     lines = text.split('\n')
-    output = []
+    final_html_parts = []
     
-    # State tracking
+    # Buffers
+    normal_lines = []
+    callout_lines = []
+    
+    # State
     in_callout = False
-    callout_type = None
-    callout_title = None
-    callout_buffer = [] # Stores content lines to be parsed as markdown later
+    callout_type = "note"
+    callout_title = ""
 
-    def flush_callout():
-        # This function compiles the buffered lines, runs markdown on them, 
-        # and wraps them in the div.
-        nonlocal in_callout, callout_buffer
-        if not in_callout: return
-        
-        # Parse the inner markdown (Fixes bold/lists inside callouts)
-        inner_text = "\n".join(callout_buffer)
-        inner_html = markdown.markdown(inner_text, extensions=['tables', 'fenced_code', 'nl2br', 'sane_lists'])
-        
-        display_title = callout_title if callout_title else callout_type.title()
-        
-        html_block = f"""
-        <div class="admonition {callout_type.lower()}">
-            <span class="admonition-title">{display_title}</span>
-            {inner_html}
-        </div>
-        """
-        output.append(html_block)
-        callout_buffer = []
-        in_callout = False
+    def render_normal():
+        if normal_lines:
+            # Render standard markdown
+            md_text = "\n".join(normal_lines)
+            html = markdown.markdown(md_text, extensions=['tables', 'fenced_code', 'nl2br', 'sane_lists'])
+            
+            # Fix Mermaid blocks in normal text
+            html = re.sub(r'<pre><code class="language-mermaid">(.*?)</code></pre>', r'<div class="mermaid">\1</div>', html, flags=re.DOTALL)
+            
+            final_html_parts.append(html)
+            normal_lines.clear()
 
+    def render_callout():
+        if callout_lines:
+            # Render inner markdown
+            inner_text = "\n".join(callout_lines)
+            inner_html = markdown.markdown(inner_text, extensions=['tables', 'fenced_code', 'nl2br', 'sane_lists'])
+            
+            # Fix Mermaid inside callouts
+            inner_html = re.sub(r'<pre><code class="language-mermaid">(.*?)</code></pre>', r'<div class="mermaid">\1</div>', inner_html, flags=re.DOTALL)
+            
+            # Create the DIV manually (The parser never sees this, so it can't break it)
+            display_title = callout_title if callout_title else callout_type.title()
+            
+            block = f"""
+            <div class="admonition {callout_type.lower()}">
+                <span class="admonition-title">{display_title}</span>
+                {inner_html}
+            </div>
+            """
+            final_html_parts.append(block)
+            callout_lines.clear()
+
+    # --- Line by Line Parser ---
     for line in lines:
-        # Check for start of callout: > [!NOTE] or > [!NOTE] Title
+        # Check for start of callout: > [!TYPE] Title
         match = re.match(r'>\s*\[!(\w+)\]\s*(.*)', line)
         
         if match:
-            # If we were already in a callout, close it first
-            if in_callout: flush_callout()
+            # Switch State: Normal -> Callout
+            render_normal()
+            if in_callout: render_callout() # Close previous if nested (rare)
             
             in_callout = True
             callout_type = match.group(1)
             raw_title = match.group(2).strip()
             
-            # LOGIC FIX: If title is very long, it's likely content, not a title.
-            if len(raw_title) > 50:
-                callout_title = callout_type.title() # Default title
-                callout_buffer.append(raw_title)     # Treat text as body
-            else:
+            # Handle empty titles or long text on first line
+            if len(raw_title) > 0:
                 callout_title = raw_title
+            else:
+                callout_title = ""
                 
         elif in_callout:
             if line.strip() == "":
-                callout_buffer.append("")
+                callout_lines.append("")
             elif line.startswith(">"):
-                # Append content line (strip the leading '>')
-                callout_buffer.append(line[1:].lstrip() if len(line) > 1 else "")
+                # It's part of the callout, strip the '>'
+                content = line.lstrip('>').lstrip()
+                # If it's empty, keep it empty (paragraph break)
+                callout_lines.append(content if len(content) > 0 else "")
             else:
-                # Line doesn't start with '>', callout ended
-                flush_callout()
-                output.append(line)
+                # Line does NOT start with '>', callout ended.
+                render_callout()
+                in_callout = False
+                normal_lines.append(line)
         else:
-            output.append(line)
+            normal_lines.append(line)
 
-    if in_callout: flush_callout()
+    # Flush remaining buffers
+    if in_callout: render_callout()
+    render_normal()
 
-    return "\n".join(output)
+    return "\n".join(final_html_parts)
 
-def render_pdf(html_content):
+def generate_pdf(html_content):
     chrome_options = Options()
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
     
-    # Streamlit Cloud specific binary path
-    service = Service("/usr/bin/chromedriver") 
-    
+    service = Service("/usr/bin/chromedriver")
     driver = webdriver.Chrome(service=service, options=chrome_options)
     
     try:
         with open("temp.html", "w", encoding="utf-8") as f:
             f.write(html_content)
-            
-        driver.get("file://" + os.path.abspath("temp.html"))
         
-        # Wait slightly longer for complex Mermaid diagrams
-        time.sleep(4)
+        driver.get("file://" + os.path.abspath("temp.html"))
+        time.sleep(4) # Wait for Mermaid/MathJax
         
         pdf_data = driver.execute_cdp_cmd("Page.printToPDF", {
             'printBackground': True,
@@ -198,70 +280,56 @@ def render_pdf(html_content):
         driver.quit()
 
 # --- 5. UI LAYOUT ---
-with st.sidebar:
-    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Obsidian_RGB_logo_2020.svg/1024px-Obsidian_RGB_logo_2020.svg.png", width=50)
-    st.markdown("### Instructions")
-    st.markdown("""
-    1. Upload your `.md` file.
-    2. Click **Generate PDF**.
-    3. Diagrams & Math are preserved.
-    """)
-    st.caption("v2.0 - Fixed Callouts")
 
-col1, col2 = st.columns([1, 1])
-with col1:
-    st.title("Markdown to PDF")
-    st.markdown("### Professional Converter")
-    st.markdown("Supports **Mermaid**, **MathJax**, and **Obsidian Callouts** properly.")
+st.title("Obsidian to PDF Converter")
+st.markdown("Upload your note, and the PDF will generate **automatically**.")
 
-with col2:
-    with st.container():
-        st.markdown('<div class="css-card">', unsafe_allow_html=True)
-        uploaded_file = st.file_uploader("Upload .md file", type=["md"])
-        st.markdown('</div>', unsafe_allow_html=True)
+# Custom File Uploader Area
+with st.container():
+    uploaded_file = st.file_uploader(" ", type=["md"], label_visibility="collapsed")
 
 if uploaded_file:
-    st.success(f"📄 Loaded: {uploaded_file.name}")
+    # AUTO START LOGIC
+    # As soon as file is present, we start working.
     
-    if st.button("✨ Generate PDF"):
-        with st.status("🚀 Processing...", expanded=True) as status:
-            st.write("⚙️ Parsing Markdown & Callouts...")
-            content = uploaded_file.read().decode("utf-8")
-            
-            # 1. Process Callouts (Markdown -> HTML for blocks)
-            # This logic now handles the **bold** and - list items inside the blue boxes
-            processed_md_parts = process_obsidian_syntax(content)
-            
-            # 2. Convert the Rest of the Document
-            # We use the 'markdown' lib again for the main body, but since callouts
-            # are already HTML <div>s, we need to be careful not to break them.
-            # However, standard markdown usually leaves block HTML alone, which is exactly what we want.
-            html_body = markdown.markdown(processed_md_parts, extensions=['tables', 'fenced_code', 'nl2br', 'sane_lists'])
-            
-            # 3. Mermaid Fix
-            html_body = re.sub(r'<pre><code class="language-mermaid">(.*?)</code></pre>', r'<div class="mermaid">\1</div>', html_body, flags=re.DOTALL)
-            
-            filename = uploaded_file.name.replace(".md", "")
-            final_html = f"<html><head>{PDF_STYLE}</head><body><h1>{filename}</h1>{html_body}{SCRIPTS}</body></html>"
-            
-            st.write("📸 Rendering PDF...")
-            try:
-                pdf_bytes = render_pdf(final_html)
-                status.update(label="✅ Success!", state="complete", expanded=False)
-                st.balloons()
-                
-                # Center download button
-                c1, c2, c3 = st.columns([1, 2, 1])
-                with c2:
-                    st.download_button(
-                        label="📥 Download PDF",
-                        data=pdf_bytes,
-                        file_name=f"{filename}.pdf",
-                        mime="application/pdf",
-                        use_container_width=True
-                    )
-            except Exception as e:
-                status.update(label="❌ Error", state="error")
-                st.error(f"Error: {e}")
-
-st.markdown('<div class="footer">Fixed Formatting Update</div>', unsafe_allow_html=True)
+    st.info(f"Processing: **{uploaded_file.name}**")
+    
+    # Progress Bar
+    progress_bar = st.progress(0)
+    status_text = st.empty()
+    
+    try:
+        # Step 1: Read
+        content = uploaded_file.read().decode("utf-8")
+        progress_bar.progress(20)
+        
+        # Step 2: Parse (The robust way)
+        status_text.text("Parsing Markdown & Callouts...")
+        html_body = parse_markdown_chunks(content)
+        progress_bar.progress(50)
+        
+        # Step 3: Combine
+        filename = uploaded_file.name.replace(".md", "")
+        final_html = f"<html><head>{PDF_STYLE}</head><body><h1>{filename}</h1>{html_body}{SCRIPTS}</body></html>"
+        
+        # Step 4: Render
+        status_text.text("Rendering PDF in Chromium...")
+        pdf_bytes = generate_pdf(final_html)
+        progress_bar.progress(100)
+        
+        status_text.empty() # Clear status
+        progress_bar.empty() # Clear bar
+        
+        # Success Area
+        st.success("✅ Conversion Complete!")
+        
+        # BIG DOWNLOAD BUTTON
+        st.download_button(
+            label="⬇️ DOWNLOAD PDF NOW",
+            data=pdf_bytes,
+            file_name=f"{filename}.pdf",
+            mime="application/pdf"
+        )
+        
+    except Exception as e:
+        st.error(f"Error: {e}")
