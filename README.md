@@ -106,7 +106,7 @@ graph TD;
     B -- No --> D[Debug];
 ```
 ### 3. Math (LaTeX)
-```latex
+```LaTeX
 The quadratic formula is $x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$.
 ```
 ### 📂 Project Structure
