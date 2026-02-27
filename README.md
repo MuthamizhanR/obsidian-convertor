@@ -1,4 +1,3 @@
-
 # 📄 Obsidian to PDF Converter
 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io)
@@ -90,50 +89,33 @@ Want to host this yourself for free?
 
 ### 1. Callouts
 Standard Obsidian syntax is fully supported:
-```markdown
+``` markdown
 > [!NOTE] Title
 > This is a blue note block.
 
 > [!WARNING]
 > This is a yellow warning block.
-2. Diagrams (Mermaid)
+```
 
-Use the standard code block syntax:
+### 2. Diagrams (Mermaid)
 
-code
-Markdown
-download
-content_copy
-expand_less
 ```mermaid
 graph TD;
     A[Start] --> B{Is it working?};
     B -- Yes --> C[Great!];
     B -- No --> D[Debug];
-code
-Code
-download
-content_copy
-expand_less
+```
 ### 3. Math (LaTeX)
 ```markdown
 The quadratic formula is $x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$.
-📂 Project Structure
-code
-Text
-download
-content_copy
-expand_less
+```
+### 📂 Project Structure
 .
 ├── app.py              # Main application logic
 ├── requirements.txt    # Python dependencies (Streamlit, Selenium, etc.)
 ├── packages.txt        # System dependencies (Chromium for Streamlit Cloud)
 └── README.md           # This file
-🤝 Contributing
 
+### 🤝 Contributing
 Contributions are welcome! Please feel free to submit a Pull Request.
-
-📄 License
-
-This project is open-source and available under the MIT License.
 
