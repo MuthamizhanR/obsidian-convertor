@@ -110,12 +110,13 @@ graph TD;
 The quadratic formula is $x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$.
 ```
 ### 📂 Project Structure
+```
 .
 ├── app.py              # Main application logic
 ├── requirements.txt    # Python dependencies (Streamlit, Selenium, etc.)
 ├── packages.txt        # System dependencies (Chromium for Streamlit Cloud)
 └── README.md           # This file
-
+```
 ### 🤝 Contributing
 Contributions are welcome! Please feel free to submit a Pull Request.
 
