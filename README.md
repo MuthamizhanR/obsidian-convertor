@@ -36,7 +36,7 @@ Unlike standard converters, this tool preserves complex Obsidian features like *
 
 The easiest way to use this is via the web interface. 
 
-1.  **[Click here to open the App](https://your-app-url.streamlit.app)** (Replace with your actual Streamlit URL).
+1.  **[Click here to open the App](https://your-app-url.streamlit.app)** .
 2.  Upload your `.md` file.
 3.  Wait for the processing bar.
 4.  Click **Download PDF**.
